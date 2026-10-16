@@ -50,7 +50,8 @@ sudo bash install/wanos/install.sh
 ```
 
 脚本会自动完成：装 nginx → 下站点产物 → 下静态资源 → 写 nginx 配置 →
-设置进度目录权限 → 起服务并自启 → **curl 自检三级路径**（`/`、`/icon.svg`、`/api/progress/state.json`）。
+设置进度目录权限 → 起服务并自启 → **自检**（`/`、`/icon.svg` 看状态码，
+再对 `/api/progress/` 做一次真实的 PUT→GET→DELETE 往返，确认共享进度真的可写可读）。
 
 装完会打印访问地址。卸载：
 
@@ -129,8 +130,8 @@ location /api/progress/ {
 
 | 平台 | 结果 |
 | --- | --- |
-| iStoreOS 24.10.8（Docker 27.3.1, aarch64） | ✅ 实机安装 → 站点 200、`/audio/*.opus` 200、404 正常、`/api/progress` PUT 201 + GET 200；按“装完即删”流程清理干净 |
-| 玩客云 WanOS（Ubuntu 20.04 armhf, nginx-core 1.18.0） | ✅ 长期运行（8899），已做断电重启端到端验证 |
+| iStoreOS 24.10.8（Docker 27.3.1, aarch64） | ✅ 用本仓库的 `install/istoreos-openwrt/install.sh` **实机跑通**：站点 `GET /` = 200、进度接口 `PUT` = 201 + `GET` 回读一致（从另一台电脑写入/读取验证）、`scripts/fetch-assets.sh --only textbook-pages` 下载 201.7MB 并正确解出 1582 个文件、课本页正常显示为 `image/jpeg`。按「装完即删」流程清理干净（容器、镜像、安装目录全部移除，未留残留） |
+| 玩客云 WanOS（Ubuntu 20.04 armhf, nginx-core 1.18.0） | ✅ 用 `install/wanos/install.sh` 复跑验证通过；站点长期运行（8899），已做断电重启端到端验证 |
 | 飞牛 fnOS（Docker） | ✅ 长期运行（8899） |
 
 - OpenWrt 官方 feed 的 nginx **不带 `--with-http_dav_module`**，静态站点能跑、但共享进度没有，
@@ -145,12 +146,14 @@ location /api/progress/ {
 加 `--port 8900`（或任意空闲端口）重新跑一遍即可；确认端口占用用 `netstat -tln | grep 8899`。
 
 **Q：换设备访问，进度没同步？**
-按顺序排查：① `/api/progress/state.json` 能不能 GET 到内容；② 进度目录权限
-（Docker 方案 worker 是 uid 101，原生方案是 www-data）；③ 浏览器是不是开了无痕/隐私模式
-（localStorage 被禁不影响，但远端请求被拦截就会退回本地）。
+按顺序排查：① `/api/progress/state.json` 能不能 GET 到内容
+（**首次使用时 404 属正常** —— 表示服务器上还没有进度，第一台打开的设备会把自己的进度推上去）；
+② 进度目录权限（Docker 方案 worker 是 uid 101，原生方案是 www-data）；
+③ 浏览器是不是开了无痕/隐私模式（localStorage 被禁不影响，但远端请求被拦截就会退回本地）。
 
 **Q：进度会不会被站点升级覆盖掉？**
 不会。进度目录和站点目录是分开挂载的，站点产物重装只覆盖 `out/`，`progress-data/` 不动。
+安装脚本也不会往进度目录里写任何初始文件，所以重复执行安装不会重置已有进度。
 
 **Q：能不能只给 iPad 用、不要共享？**
 可以。跳过前端补丁（用上游原始构建产物）就退回各设备独立进度；但本仓库的 Release 产物已经带了共享改造。

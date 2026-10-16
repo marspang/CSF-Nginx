@@ -23,18 +23,41 @@ fetch() { # fetch <url> <outfile>
   else wget -q -O "$2" "$1"; fi
 }
 
+# http_code <curl参数...> —— 取 HTTP 状态码；连不上时 curl 自己会打印 000，
+# 不能再兜一个 "000"，否则会拼成 "000000" 干扰判等。
+http_code() {
+  local c
+  c="$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$@" 2>/dev/null)"
+  printf '%s' "${c:-000}"
+}
+
 sha256_of() { # sha256_of <file>
   if have sha256sum; then sha256sum "$1" | awk '{print $1}'
   elif have shasum;   then shasum -a 256 "$1" | awk '{print $1}'
   else die "系统没有 sha256sum/shasum，无法校验下载"; fi
 }
 
-# 找出所有“有空间、可写”的挂载点，按剩余空间降序输出
+# 找出所有“有空间、可写”的真实存储挂载点，按剩余空间降序输出
+#
+# 只认块设备文件系统（ext/xfs/btrfs/…）。这一条很关键：
+# 装了 Docker 的机器上 `df` 会列出每个容器的 overlay 挂载点
+# （.../docker/overlay2/<id>/merged），那种目录看着又大又可写，
+# 但如果把站点装进去，等于往某个正在运行的容器的根文件系统里灌 2GB 数据。
 large_mounts() { # large_mounts
-  df -kP 2>/dev/null | awk 'NR>1{print $4"\t"$6}' | while IFS="$(printf '\t')" read -r avail mp; do
-    case "$mp" in /|/rom|/tmp|/overlay|/boot|/dev*|/proc*|/sys*|/var*|/etc*|/usr*) continue ;; esac
+  awk '{print $2"|"$3}' /proc/mounts 2>/dev/null | while IFS="|" read -r mp fs; do
+    case "$mp" in
+      /|/rom|/tmp*|/overlay*|/boot*|/dev*|/proc*|/sys*|/var*|/etc*|/usr*|/run*) continue ;;
+      */overlay2/*|*/merged|*/containers/*) continue ;;
+    esac
+    case "$fs" in
+      ext2|ext3|ext4|xfs|btrfs|f2fs|exfat|vfat|ntfs|ntfs3|zfs|ufs) ;;
+      *) continue ;;
+    esac
     [ -d "$mp" ] && [ -w "$mp" ] || continue
-    printf '%s\t%s\n' "$avail" "$mp"
+    local avail
+    avail=$(df -kP "$mp" 2>/dev/null | awk 'NR==2{print $4}')
+    [ -n "$avail" ] || continue
+    printf '%s|%s\n' "$avail" "$mp"
   done | sort -rn
 }
 
@@ -51,7 +74,7 @@ pick_dir() { # pick_dir <min_kb> [candidates...]
     done
     die "指定的候选目录空间不足（需要 ≥$((min_kb/1024/1024))GB）：$*"
   fi
-  while IFS="$(printf '\t')" read -r avail cand; do
+  while IFS="|" read -r avail cand; do
     [ -n "$cand" ] || continue
     [ "$avail" -ge "$min_kb" ] && { echo "$cand"; return 0; }
   done < <(large_mounts)
@@ -90,12 +113,13 @@ install_core() {
 }
 
 # prep_progress_dir <进度目录>
+# 注意：故意不预置 state.json。
+#   服务器上没有这个文件 = “还没有共享进度”，前端会把本机已有的进度作为初始基准推上来；
+#   若预置一个空 {}，前端会认为“服务器进度就是空的”，反而把各设备已有的本地进度冲掉。
 prep_progress_dir() {
   local dir="$1"
   mkdir -p "$dir"
   chmod 777 "$dir"
-  [ -f "$dir/state.json" ] || echo '{}' > "$dir/state.json"
-  chmod 666 "$dir/state.json"
 }
 
 docker_run_site() { # docker_run_site <容器名> <镜像> <端口> <conf> <站点> <进度>
@@ -113,13 +137,34 @@ docker_run_site() { # docker_run_site <容器名> <镜像> <端口> <conf> <站�
 }
 
 # verify_site <端口>
+# 静态部分看状态码；进度接口做一次真正的 PUT -> GET -> DELETE 往返，
+# 而不是只看某个文件在不在（空目录时 GET 本来就该 404）。
 verify_site() {
   local port="$1" ok=1 code path
-  for path in "/" "/icon.svg" "/api/progress/state.json"; do
-    code="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:${port}${path}" 2>/dev/null || echo 000)"
+  for path in "/" "/icon.svg"; do
+    code="$(http_code "http://127.0.0.1:${port}${path}")"
     printf '    %-30s -> %s\n' "$path" "$code"
     [ "$code" = "200" ] || ok=0
   done
+
+  local probe="/api/progress/.write-probe"
+  local body
+  code="$(http_code -X PUT --data '{"probe":1}' "http://127.0.0.1:${port}${probe}")"
+  if [ "$code" = "201" ] || [ "$code" = "204" ] || [ "$code" = "200" ]; then
+    body="$(curl -s "http://127.0.0.1:${port}${probe}" 2>/dev/null || true)"
+    if [ "$body" = '{"probe":1}' ]; then
+      printf '    %-30s -> PUT %s / 回读一致 ✅\n' "/api/progress/ (共享进度)" "$code"
+      curl -s -o /dev/null -X DELETE "http://127.0.0.1:${port}${probe}" 2>/dev/null || true
+    else
+      printf '    %-30s -> PUT %s 但回读为 "%s" ❌\n' "/api/progress/ (共享进度)" "$code" "$body"
+      ok=0
+    fi
+  else
+    printf '    %-30s -> PUT %s ❌（进度目录不可写？Docker 方案的 worker 是 uid 101，原生方案是 www-data）\n' \
+           "/api/progress/ (共享进度)" "$code"
+    ok=0
+  fi
+
   [ "$ok" = 1 ]
 }
 

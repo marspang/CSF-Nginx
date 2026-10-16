@@ -73,13 +73,10 @@ docker info >/dev/null 2>&1 || die "docker 守护进程没跑起来，先 /etc/i
 
 # ============================================================ 定位落盘分区
 # OpenWrt 的 /overlay 往往只有几百 MB，站点必须放在有空间的挂载分区上。
-command -v df >/dev/null 2>&1 || die "缺少 df 命令"
+# 注意排除 Docker 的 overlay 挂载点（.../overlay2/<id>/merged）——那里看着很大，
+# 实际是别的容器的根文件系统，装进去会把 2GB 数据灌到人家容器里。
 if [ -z "$ROOT" ]; then
-  CAND="$(large_mounts | awk 'NR==1{print $2}')"
-  [ -n "$CAND" ] || die "找不到合适的挂载点，请用 --root 手动指定"
-  AVAIL="$(df -kP "$CAND" | awk 'NR==2{print $4}')"
-  [ "$AVAIL" -ge "$NEED_KB" ] || die "最大可用分区 $CAND 只有 $((AVAIL/1024))MB，不足 4GB。请插入存储或用 --root 指定"
-  ROOT="$CAND/csf-nginx"
+  ROOT="$(pick_dir "$NEED_KB")/csf-nginx"
 fi
 
 SITE_ROOT="$ROOT/out"
@@ -91,7 +88,8 @@ log "平台：$PLATFORM"
 log "安装目录：$ROOT（该分区剩余 $(df -hP "$ROOT" | awk 'NR==2{print $4}')）"
 
 # ============================================================ 配置 / 产物 / 资源
-render_conf "$REPO_DIR/conf/studyfree.conf" "$CONF_DIR/default.conf" "$PORT" "/srv/web/out" "/srv/web/progress-data"
+# 容器内固定监听 80，对外端口由 -p $PORT:80 映射，所以这里渲染的是 80
+render_conf "$REPO_DIR/conf/studyfree.conf" "$CONF_DIR/default.conf" "80" "/srv/web/out" "/srv/web/progress-data"
 install_core "$SITE_ROOT" "$FORCE"
 
 if [ "$WITH_ASSETS" = 1 ]; then

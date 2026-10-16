@@ -24,7 +24,6 @@ PLATFORM="Debian / Ubuntu (原生 nginx)"
 SITE_NAME="studyfree"
 AVAIL_CONF="/etc/nginx/sites-available/$SITE_NAME"
 ENABLED_CONF="/etc/nginx/sites-enabled/$SITE_NAME"
-CHECK_CONF="/etc/nginx/conf.d/$SITE_NAME-check.conf"
 NGINX_USER="www-data"
 
 PORT=8899
@@ -59,7 +58,7 @@ DATA_DIR="$ROOT/progress-data"
 # ============================================================ 卸载
 if [ "$UNINSTALL" = 1 ]; then
   log "卸载站点配置与目录"
-  rm -f "$ENABLED_CONF" "$AVAIL_CONF" "$CHECK_CONF"
+  rm -f "$ENABLED_CONF" "$AVAIL_CONF"
   systemctl reload nginx 2>/dev/null || true
   warn "数据目录未自动删除：$ROOT （确认后手动 rm -rf $ROOT）"
   log "完成。"
@@ -120,20 +119,21 @@ else
 fi
 
 # ============================================================ 权限
-mkdir -p "$DATA_DIR"; chown "$NGINX_USER:$NGINX_USER" "$DATA_DIR"; chmod 775 "$DATA_DIR"
-[ -f "$DATA_DIR/state.json" ] || echo '{}' > "$DATA_DIR/state.json"
-chown "$NGINX_USER:$NGINX_USER" "$DATA_DIR/state.json"; chmod 664 "$DATA_DIR/state.json"
+# 进度目录必须让 nginx worker（www-data）可写。
+# 故意不预置 state.json：没有这个文件 = “还没有共享进度”，
+# 前端会把本机已有的进度作为初始基准推上来；预置空 {} 反而会冲掉设备上已有的进度。
+mkdir -p "$DATA_DIR"
+chown "$NGINX_USER:$NGINX_USER" "$DATA_DIR"
+chmod 775 "$DATA_DIR"
 chmod -R a+rX "$SITE_ROOT" 2>/dev/null || true
 
 # ============================================================ 语法自检 + 起服务
-# 先用一个小 conf 片段把 studyfree 配置拉进来做纯语法检查，避免直接 reload 把线上打挂
-if ! nginx -t >/dev/null 2>&1; then
-  nginx -t || die "nginx 配置语法检查失败（上面有具体行号），已中止，未改动线上服务"
-fi
+# 先启用再做语法检查；不通过就撤销启用，避免把该机上原有的服务打挂
 ln -sfn "$AVAIL_CONF" "$ENABLED_CONF"
 if ! nginx -t; then
   rm -f "$ENABLED_CONF"
-  die "studyfree 配置有误，已撤销启用（站点 $PORT 未生效）"
+  nginx -t
+  die "studyfree 配置有误，已撤销启用（站点 $PORT 未生效，原有站点不受影响）"
 fi
 
 systemctl enable nginx >/dev/null 2>&1 || true

@@ -84,7 +84,8 @@ log "平台：$PLATFORM"
 log "安装目录：$ROOT（剩余 $(df -hP "$ROOT" | awk 'NR==2{print $4}')）"
 
 # ============================================================ 配置 / 产物 / 资源
-render_conf "$REPO_DIR/conf/studyfree.conf" "$CONF_DIR/default.conf" "$PORT" "/srv/web/out" "/srv/web/progress-data"
+# 容器内固定监听 80，对外端口由 -p $PORT:80 映射（docker-compose.yml 同理）
+render_conf "$REPO_DIR/conf/studyfree.conf" "$CONF_DIR/default.conf" "80" "/srv/web/out" "/srv/web/progress-data"
 install_core "$SITE_ROOT" "$FORCE"
 
 if [ "$WITH_ASSETS" = 1 ]; then

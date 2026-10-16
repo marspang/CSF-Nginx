@@ -43,7 +43,7 @@
 | worker 用户 | `nginx`（uid 101） | `www-data`（uid 33） |
 | 进度目录权限 | `chmod 777` | `chown www-data:www-data` + `775` |
 | 站点路径 | 宿主机自定义，容器内 `/srv/web/out` | 直接 `/srv/web/out` |
-| 监听端口 | `-p 宿主端口:80` | 配置里直接 `listen` |
+| 监听端口 | 容器内固定 `listen 80`，宿主端口由 `-p 宿主:80` 映射 | 配置里直接 `listen <端口>` |
 | 开机自启 | `docker --restart unless-stopped` | `systemctl enable nginx` |
 | 落盘位置 | 需要大分区（OpenWrt 的 overlay 通常很小） | 根分区或外挂存储 |
 
