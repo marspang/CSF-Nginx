@@ -1,0 +1,23 @@
+--- /tmp/progress.ts.bak	2026-10-17 00:14:11
++++ patches/progress.ts	2026-10-17 00:03:22
+@@ -4,6 +4,7 @@
+ import { persist, createJSONStorage } from "zustand/middleware";
+ import type { Question, LessonResult } from "@/types";
+ import { DEFAULT_EQUIPPED, getCosmeticById, getStarterCosmetics } from "@/lib/cosmetics";
++import { remoteProgressStorage } from "@/lib/remoteProgressStorage";
+ 
+ /**
+  * 错题条目，含 SRS（间隔重复）字段。
+@@ -680,7 +681,11 @@
+     }),
+     {
+       name: "csf-progress-v1",
+-      storage: createJSONStorage(() => localStorage),
++      // 进度存到服务器上（而不是只存在浏览器里），同一台服务器的所有设备共用一份
++      storage: createJSONStorage(() => remoteProgressStorage),
++      // 由 ProgressHydrationGate 在首屏主动触发 rehydrate，
++      // 保证页面上的组件都拿到"真实进度"之后才挂载
++      skipHydration: true,
+       // 版本迁移：
+       //   v1 → v2：新增 hearts / dailyGoal / freezes / activeLesson
+       //   v2 → v3：新增 gems / lifetimeGems / claimedChests / perfectedLessons + autoNarrate

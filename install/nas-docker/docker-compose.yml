@@ -1,0 +1,18 @@
+# 小猫头鹰课堂 (ChinaStudyFree) — NAS / Docker 主机 Compose 部署
+#
+# 用法（先按 install.sh 准备好 conf/ out/ progress-data/ 三个目录）：
+#   CSF_ROOT=/vol1/csf-nginx docker compose up -d
+#
+# 不设置 CSF_ROOT 时默认 /vol1/csf-nginx（飞牛 fnOS 常见存储根）。
+
+services:
+  csf-nginx:
+    image: nginx:alpine
+    container_name: csf-nginx
+    restart: unless-stopped
+    ports:
+      - "${CSF_PORT:-8899}:80"
+    volumes:
+      - "${CSF_ROOT:-/vol1/csf-nginx}/conf/default.conf:/etc/nginx/conf.d/default.conf:ro"
+      - "${CSF_ROOT:-/vol1/csf-nginx}/out:/srv/web/out:ro"
+      - "${CSF_ROOT:-/vol1/csf-nginx}/progress-data:/srv/web/progress-data"
