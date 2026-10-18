@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-#  小猫头鹰课堂 (ChinaStudyFree) — 通用 NAS / Docker 主机一键部署
+#  聪聪学堂 (ChinaStudyFree) — 通用 NAS / Docker 主机一键部署
 #
 #  适用：飞牛 fnOS、群晖 DSM、Unraid、威联通 QTS、TrueNAS、任意装了 Docker 的 Linux
 #  方案：Docker + nginx:alpine（与 iStoreOS 版完全同构，容器内路径一致）

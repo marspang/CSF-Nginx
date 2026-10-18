@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-#  小猫头鹰课堂 (ChinaStudyFree) — 玩客云 / WanOS 一键部署
+#  聪聪学堂 (ChinaStudyFree) — 玩客云 / WanOS 一键部署
 #
 #  玩客云刷的 WanOS 底层其实是 Ubuntu 20.04.6 LTS (armhf)，带 apt + systemd，
 #  所以这里复用 install/debian 的原生 nginx 方案，只额外做玩客云的前置检查：

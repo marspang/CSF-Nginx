@@ -1,4 +1,4 @@
-# 小猫头鹰课堂 (ChinaStudyFree) — NAS / Docker 主机 Compose 部署
+# 聪聪学堂 (ChinaStudyFree) — NAS / Docker 主机 Compose 部署
 #
 # 用法（先按 install.sh 准备好 conf/ out/ progress-data/ 三个目录）：
 #   CSF_ROOT=/vol1/csf-nginx docker compose up -d

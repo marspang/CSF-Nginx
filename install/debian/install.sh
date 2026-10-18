@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-#  小猫头鹰课堂 (ChinaStudyFree) — Debian / Ubuntu 原生 nginx 一键部署
+#  聪聪学堂 (ChinaStudyFree) — Debian / Ubuntu 原生 nginx 一键部署
 #
 #  适用：Debian 11/12/13、Ubuntu 20.04/22.04/24.04 等 apt 系发行版
 #  方案：apt 安装 nginx（含 http_dav 模块）+ 原生 systemd 服务，不用 Docker

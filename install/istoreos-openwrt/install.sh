@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-#  小猫头鹰课堂 (ChinaStudyFree) — iStoreOS / OpenWrt 一键部署
+#  聪聪学堂 (ChinaStudyFree) — iStoreOS / OpenWrt 一键部署
 #
 #  方案：Docker + nginx:alpine
 #    OpenWrt 系的 opkg 源里没有现成的 nginx（而且官方 feed 的 nginx 不带
