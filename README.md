@@ -29,9 +29,17 @@
 | <img src="assets/icons/fnos.png" width="26" align="center">&nbsp; **飞牛 fnOS（NAS）** | Docker（`nginx:alpine`） | `install/nas-docker/install.sh` | ✅ **长期运行中**（端口 8899） |
 | <img src="assets/icons/wanos.png" width="26" align="center">&nbsp; **玩客云 WanOS（Ubuntu 20.04 armhf）** | 原生（apt + systemd） | `install/wanos/install.sh` | ✅ **长期运行中**，已做断电重启端到端验证 |
 | <img src="assets/icons/debian.svg" width="26" align="center">&nbsp; **Debian / Ubuntu** | 原生（apt + systemd） | `install/debian/install.sh` | ✅ 在 Ubuntu 20.04（玩客云）验证；Debian 同构可用 |
-| <img src="assets/icons/fnos.png" width="26" align="center">&nbsp; 群晖 DSM / Unraid / 威联通 / TrueNAS | Docker（`nginx:alpine`） | `install/nas-docker/install.sh` | ⚪ 同构方案，未逐台验证 |
+| <img src="assets/icons/nas.png" width="26" align="center">&nbsp; 群晖 DSM / Unraid / 威联通 / TrueNAS | Docker（`nginx:alpine`） | `install/nas-docker/install.sh` | ⚪ 同构方案，未逐台验证 |
 
-<img src="assets/icons/nginx.svg" height="22" align="center">&nbsp; 四种平台最终都跑在 **nginx** 之上；共享进度由 nginx 的内置 WebDAV 模块提供，**不需要任何后端服务或数据库**。
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/icons/nginx-dark.svg">
+    <img src="assets/icons/nginx.svg" height="30" alt="nginx">
+  </picture>
+  <br>
+  四种平台最终都跑在 <b>nginx</b> 之上。<br>
+  共享进度由 nginx 的内置 WebDAV 模块提供，<b>不需要任何后端服务或数据库</b>。
+</p>
 
 - **架构无要求**：aarch64（iStoreOS / 飞牛）、armhf（玩客云）、x86_64 均已实测或同构可用。
 - **纯 OpenWrt（不带 Docker）不支持**：官方 feed 的 nginx 是裁剪版、**不带 `--with-http_dav_module`**，静态页面能开但共享进度没有。能装 Docker 就走 Docker 路线。原因见 [docs/PLATFORMS.md](docs/PLATFORMS.md)。
