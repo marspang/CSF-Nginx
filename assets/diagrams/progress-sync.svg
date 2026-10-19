@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" width="960" height="480" role="img" aria-label="共享进度同步原理：局域网内多台设备通过 nginx 的 WebDAV 端点读写同一份 progress-data/state.json">
+  <defs>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#14224A"/>
+      <stop offset="1" stop-color="#080D1B"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#8FA8CC"/>
+    </marker>
+    <marker id="arrow-both" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#34D399"/>
+    </marker>
+    <style>
+      .t { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; }
+    </style>
+  </defs>
+
+  <rect x="1" y="1" width="958" height="478" rx="18" fill="url(#panel)" stroke="#26355A"/>
+
+  <text class="t" x="480" y="46" text-anchor="middle" fill="#FFFFFF" font-size="24" font-weight="700">共享进度同步原理</text>
+  <text class="t" x="480" y="71" text-anchor="middle" fill="#9FB6D8" font-size="14">局域网里所有设备，读写同一份 progress-data/state.json</text>
+
+  <!-- 左侧：各种设备 -->
+  <g>
+    <rect x="28" y="112" width="188" height="64" rx="12" fill="#16233D" stroke="#26355A"/>
+    <text class="t" x="48" y="140" fill="#FFFFFF" font-size="16" font-weight="600">iPad</text>
+    <text class="t" x="48" y="160" fill="#8FA8CC" font-size="12">localStorage 只是缓存</text>
+
+    <rect x="28" y="198" width="188" height="64" rx="12" fill="#16233D" stroke="#26355A"/>
+    <text class="t" x="48" y="226" fill="#FFFFFF" font-size="16" font-weight="600">手机</text>
+    <text class="t" x="48" y="246" fill="#8FA8CC" font-size="12">换个设备接着学</text>
+
+    <rect x="28" y="284" width="188" height="64" rx="12" fill="#16233D" stroke="#26355A"/>
+    <text class="t" x="48" y="312" fill="#FFFFFF" font-size="16" font-weight="600">电脑</text>
+    <text class="t" x="48" y="332" fill="#8FA8CC" font-size="12">IP 与 .local 同一份</text>
+  </g>
+
+  <!-- 设备 -> nginx -->
+  <line x1="216" y1="144" x2="278" y2="144" stroke="#8FA8CC" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <line x1="216" y1="230" x2="278" y2="230" stroke="#8FA8CC" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <line x1="216" y1="316" x2="278" y2="316" stroke="#8FA8CC" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text class="t" x="248" y="230" text-anchor="middle" fill="#8FA8CC" font-size="11" transform="rotate(-90 248 230)">GET / PUT / DELETE</text>
+
+  <!-- 中间：nginx -->
+  <rect x="280" y="100" width="340" height="250" rx="16" fill="#16233D" stroke="#0059FF" stroke-width="2"/>
+  <text class="t" x="450" y="130" text-anchor="middle" fill="#FFFFFF" font-size="16" font-weight="700">nginx（一台设备）</text>
+  <text class="t" x="450" y="150" text-anchor="middle" fill="#9FB6D8" font-size="12">站点与进度写入都在这里</text>
+
+  <rect x="302" y="166" width="296" height="66" rx="10" fill="#14224A" stroke="#26355A"/>
+  <text class="t" x="322" y="192" fill="#FFFFFF" font-size="14" font-weight="600">静态站点  out/</text>
+  <text class="t" x="322" y="212" fill="#8FA8CC" font-size="11.5">HTML / JS / CSS · 题库 · 音频（只读）</text>
+
+  <rect x="302" y="248" width="296" height="66" rx="10" fill="#14224A" stroke="#34D399"/>
+  <text class="t" x="322" y="274" fill="#FFFFFF" font-size="14" font-weight="600">WebDAV  /api/progress/</text>
+  <text class="t" x="322" y="294" fill="#8FA8CC" font-size="11.5">dav_methods  GET · PUT · DELETE</text>
+
+  <!-- nginx <-> 进度文件 -->
+  <line x1="620" y1="281" x2="700" y2="281" stroke="#34D399" stroke-width="2" marker-start="url(#arrow-both)" marker-end="url(#arrow-both)"/>
+  <text class="t" x="660" y="254" text-anchor="middle" fill="#8FA8CC" font-size="11">PUT / GET</text>
+  <text class="t" x="660" y="268" text-anchor="middle" fill="#8FA8CC" font-size="11">独立进度目录</text>
+
+  <!-- 右侧：权威副本 -->
+  <rect x="700" y="180" width="232" height="110" rx="14" fill="#16233D" stroke="#009639" stroke-width="2"/>
+  <text class="t" x="816" y="214" text-anchor="middle" fill="#FFFFFF" font-size="15" font-weight="700">progress-data/</text>
+  <text class="t" x="816" y="238" text-anchor="middle" fill="#34D399" font-size="15" font-weight="700">state.json</text>
+  <text class="t" x="816" y="264" text-anchor="middle" fill="#8FA8CC" font-size="11.5">权威副本 · 重装站点不丢</text>
+
+  <!-- 底部说明 -->
+  <g>
+    <rect x="28" y="392" width="288" height="64" rx="12" fill="#14224A" stroke="#26355A"/>
+    <text class="t" x="172" y="418" text-anchor="middle" fill="#FFFFFF" font-size="13" font-weight="600">写入防抖 600ms</text>
+    <text class="t" x="172" y="438" text-anchor="middle" fill="#8FA8CC" font-size="11.5">连续答题合并成一次请求</text>
+
+    <rect x="336" y="392" width="288" height="64" rx="12" fill="#14224A" stroke="#26355A"/>
+    <text class="t" x="480" y="418" text-anchor="middle" fill="#FFFFFF" font-size="13" font-weight="600">关页 / 切后台立即补发</text>
+    <text class="t" x="480" y="438" text-anchor="middle" fill="#8FA8CC" font-size="11.5">pagehide · visibilitychange</text>
+
+    <rect x="644" y="392" width="288" height="64" rx="12" fill="#14224A" stroke="#26355A"/>
+    <text class="t" x="788" y="418" text-anchor="middle" fill="#FFFFFF" font-size="13" font-weight="600">8 秒超时退回本地</text>
+    <text class="t" x="788" y="438" text-anchor="middle" fill="#8FA8CC" font-size="11.5">服务器不可达也能继续做题</text>
+  </g>
+</svg>

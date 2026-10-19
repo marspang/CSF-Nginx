@@ -2,7 +2,7 @@
 
 <h1 align="center">CSF-Nginx</h1>
 
-<h3 align="center">把「聪聪学堂」自托管到路由器 / NAS / 小盒子，全屋共用一份学习进度</h3>
+<h3 align="center">把「聪聪学堂」搬进自家路由器 / NAS / 小盒子<br>全屋设备共用一份学习进度，装完即用、离线断网也能继续学</h3>
 
 <p align="center">
 <a href="https://github.com/marspang/CSF-Nginx/releases"><img src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-v1.0.0-f1c40f?style=for-the-badge" alt="版本"></a>
@@ -115,12 +115,47 @@ sudo bash install/<平台>/install.sh --uninstall --root <安装目录>
 
 ---
 
+## 用一段提示词，让你的 Agent 自动安装
+
+不想敲命令也行——把下面这段提示词**整段复制**，发给你本机 / 工作台上的 AI Agent（Codex、WorkBuddy、豆包工作、Trae、Cursor……任何能读写文件并执行命令的 Agent），它会自己读仓库、认设备、挑对应脚本给你装好。
+
+```text
+请帮我把「聪聪学堂」自托管站点部署到这台设备上：
+https://github.com/marspang/CSF-Nginx
+
+先读仓库的 README 和 docs/PLATFORMS.md，再根据 install/ 下的脚本判断这台设备走哪条路线：
+带 Docker 的 iStoreOS / OpenWrt、飞牛 fnOS / 群晖等 NAS、Debian / Ubuntu，
+还是玩客云这类刷了 WanOS 的小盒子；挑对应的 install.sh 执行安装，
+最后用 curl 自检站点首页，并对 /api/progress/ 做一次 PUT → GET → DELETE 往返。
+
+动手前先跟我确认下面几项，缺哪项就问我，不要自己猜：
+1) 设备 IP 和 SSH 端口（你也可以先扫一遍局域网把它找出来）；
+2) SSH 登录方式：root 还是 sudo 用户，用密码还是密钥；
+3) 是否已有本地的 2.1GB 资源副本（盒子直连 GitHub 很慢，有的话用 --assets-src 指过去）。
+
+过程中缺依赖（docker / nginx / git / curl / tar）就说明缺什么并帮我装上。
+凡是需要我在设备上确认、授权或输密码的，告诉我明确步骤，等我做完再继续。
+装完把访问地址、自检结果和 --uninstall 卸载命令一起告诉我。
+```
+
+> ⚠️ **注意事项**
+>
+> - **Agent 得能连到目标设备**：它和盒子要在同一局域网，或者你已经配好 Tailscale / 端口转发、SSH 得通。
+> - **凭据由你提供、也由你掌控**：SSH 账号密码（或密钥）需要你自己给；装完建议改密码或换成密钥，别把它长期留在聊天记录里。
+> - **设备要能装 nginx**：apt / opkg 或 Docker 都行；**纯 OpenWrt（不带 Docker）不支持共享进度**，官方 feed 的 nginx 没有 WebDAV 模块。
+> - **2.1GB 资源包很慢**：先在 NAS / 电脑上下好，再用 `--assets-src` 指过去，比让盒子直连 GitHub 快得多。
+> - **脚本会改系统配置**：安装会 `sudo` 改 nginx 配置、开端口、写 systemd 服务，**建议先在没有重要数据的测试机 / 小盒子上跑一遍**。
+> - **首次访问 `/api/progress/state.json` 返回 404 属正常**——服务器上还没有进度，第一台打开的设备会把自己的进度推上去。
+
+---
+
 ## 目录结构
 
 ```
 CSF-Nginx/
 ├── assets/
 │   ├── banner/                  README 首图（自包含 SVG，图标已内嵌）
+│   ├── diagrams/                说明图（共享进度同步原理图）
 │   └── icons/                   平台图标（iStoreOS / 飞牛 / WanOS / Debian / nginx）
 ├── conf/studyfree.conf          nginx 站点模板（含 @@占位符@@，脚本负责渲染）
 ├── install/
@@ -138,6 +173,10 @@ CSF-Nginx/
 ---
 
 ## 共享进度是怎么实现的
+
+<p align="center">
+  <img src="assets/diagrams/progress-sync.svg" alt="共享进度同步原理：多台设备通过 nginx 的 WebDAV 端点读写同一份 progress-data/state.json" width="880">
+</p>
 
 前端侧（`patches/`，Release 构建产物里已包含）把 zustand 的存储后端从 `localStorage` 换成了一个远端适配器，读写都指向：
 
@@ -186,25 +225,35 @@ location /api/progress/ {
 
 ---
 
-## 常见问题
+## 常见问题 FAQ
 
 **Q：端口 8899 被占了怎么办？**
-加 `--port 8900`（或任意空闲端口）重新跑一遍即可；确认端口占用用 `netstat -tln | grep 8899`。
+
+**A：** 加 `--port 8900`（或任意空闲端口）重新跑一遍即可；确认端口占用用 `netstat -tln | grep 8899`。
 
 **Q：换设备访问，进度没同步？**
-按顺序排查：① `/api/progress/state.json` 能不能 GET 到内容（**首次使用时 404 属正常**——表示服务器上还没有进度，第一台打开的设备会把自己的进度推上去）；② 进度目录权限（Docker 方案 worker 是 uid 101，原生方案是 `www-data`）；③ 浏览器是不是开了无痕 / 隐私模式（localStorage 被禁不影响，但远端请求被拦截就会退回本地）。
+
+**A：** 按顺序排查：
+
+1. `/api/progress/state.json` 能不能 GET 到内容（**首次使用时 404 属正常**——表示服务器上还没有进度，第一台打开的设备会把自己的进度推上去）；
+2. 进度目录权限（Docker 方案 worker 是 uid 101，原生方案是 `www-data`）；
+3. 浏览器是不是开了无痕 / 隐私模式（localStorage 被禁不影响，但远端请求被拦截就会退回本地）。
 
 **Q：进度会不会被站点升级覆盖掉？**
-不会。进度目录和站点目录是分开挂载的，站点产物重装只覆盖 `out/`，`progress-data/` 不动。安装脚本也不会往进度目录里写任何初始文件，所以重复执行安装不会重置已有进度。
+
+**A：** 不会。进度目录和站点目录是分开挂载的，站点产物重装只覆盖 `out/`，`progress-data/` 不动。安装脚本也不会往进度目录里写任何初始文件，所以重复执行安装不会重置已有进度。
 
 **Q：能不能只给 iPad 用、不要共享？**
-可以。跳过前端补丁（用上游原始构建产物）就退回各设备独立进度；但本仓库的 Release 产物已经带了共享改造。
+
+**A：** 可以。跳过前端补丁（用上游原始构建产物）就退回各设备独立进度；但本仓库的 Release 产物已经带了共享改造。
 
 **Q：路由器上装完怎么从外网访问？**
-本仓库只管局域网。外网访问方式随设备不同（OpenWrt 走端口转发 / Tailscale，NAS 走自带反代或异地组网），不属于站点部署本身。
+
+**A：** 本仓库只管局域网。外网访问方式随设备不同（OpenWrt 走端口转发 / Tailscale，NAS 走自带反代或异地组网），不属于站点部署本身。
 
 **Q：资源包 2.1GB 下不动怎么办？**
-在 NAS / 电脑上下好，用 `--assets-src /path/to/csf-assets` 指向本地副本即可。玩客云这类小盒子实测直连 GitHub Release 只有 ~11 B/s，见 [docs/PLATFORMS.md](docs/PLATFORMS.md)。
+
+**A：** 在 NAS / 电脑上下好，用 `--assets-src /path/to/csf-assets` 指向本地副本即可。玩客云这类小盒子实测直连 GitHub Release 只有 ~11 B/s，见 [docs/PLATFORMS.md](docs/PLATFORMS.md)。
 
 ---
 
