@@ -2,7 +2,7 @@
 
 <h1 align="center">CSF-Nginx</h1>
 
-<h3 align="center">把「聪聪学堂」搬进自家路由器 / NAS / 小盒子<br>全屋设备共用一份学习进度，装完即用、离线断网也能继续学</h3>
+<h3 align="center">把「聪聪学堂」自托管到路由器 / NAS / 小盒子，全屋共用一份学习进度</h3>
 
 <p align="center">
 <a href="https://github.com/marspang/CSF-Nginx/releases"><img src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-v1.0.0-f1c40f?style=for-the-badge" alt="版本"></a>
