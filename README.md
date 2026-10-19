@@ -14,8 +14,9 @@
 
 ---
 
-<details>
-<summary>目录</summary>
+[聪聪学堂](https://github.com/wuwangzhang1216/ChinaTextbookStudyFree)（ChinaStudyFree）是一个**免费、开源、纯公益**的小学全科学习平台——语文 / 数学 / 英语 / 科学，覆盖一到六年级。站点本体是 Next.js 静态导出（纯 HTML/JS/CSS，**不需要 Node 运行时**），因此随便一台能跑 nginx 的设备都能扛。
+
+## 目录
 
 - [支持的设备与实测情况](#支持的设备与实测情况)
 - [它长什么样](#它长什么样)
@@ -26,12 +27,6 @@
 - [上游内容规模](#上游内容规模来自聪聪学堂)
 - [常见问题 FAQ](#常见问题-faq)
 - [致谢与许可](#致谢与许可)
-
-</details>
-
----
-
-[聪聪学堂](https://github.com/wuwangzhang1216/ChinaTextbookStudyFree)（ChinaStudyFree）是一个**免费、开源、纯公益**的小学全科学习平台——语文 / 数学 / 英语 / 科学，覆盖一到六年级。站点本体是 Next.js 静态导出（纯 HTML/JS/CSS，**不需要 Node 运行时**），因此随便一台能跑 nginx 的设备都能扛。
 
 上游路线图里有两项长期未打的勾：
 
