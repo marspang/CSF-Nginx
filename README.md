@@ -1,18 +1,29 @@
 ![聪聪学堂 · 自托管部署套件：一份静态站点，四种平台一键部署，学习进度多设备同步。](assets/banner/banner-a.svg)
 
-# CSF-Nginx
+<h1 align="center">CSF-Nginx</h1>
 
-**把「聪聪学堂」搬到自己的路由器 / NAS / 小盒子上自托管，让家里所有设备共用同一份学习进度。**
+<h3 align="center">把「聪聪学堂」搬到自己的路由器 / NAS / 小盒子上自托管，让家里所有设备共用同一份学习进度。</h3>
 
 <p align="center">
 <a href="https://github.com/marspang/CSF-Nginx/releases"><img src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-v1.0.0-f1c40f?style=for-the-badge" alt="版本"></a>
 <a href="https://github.com/wuwangzhang1216/ChinaTextbookStudyFree"><img src="https://img.shields.io/badge/%E4%B8%8A%E6%B8%B8-%E8%81%AA%E8%81%AA%E5%AD%A6%E5%A0%82-2f81f7?style=for-the-badge" alt="上游"></a>
-<img src="https://img.shields.io/badge/%E6%94%AF%E6%8C%81%E5%B9%B3%E5%8F%B0-iStoreOS%20%2F%20%E9%A3%9E%E7%89%9BfnOS%20%2F%20WanOS%20%2F%20Debian-2ea44f?style=for-the-badge" alt="支持平台">
-<img src="https://img.shields.io/badge/%E9%83%A8%E7%BD%B2-nginx%20%2B%20WebDAV-8957e5?style=for-the-badge" alt="部署">
 <img src="https://img.shields.io/badge/%E5%90%8C%E6%AD%A5-%E8%B7%A8%E8%AE%BE%E5%A4%87%E5%AD%A6%E4%B9%A0%E8%BF%9B%E5%BA%A6-fe7d37?style=for-the-badge" alt="同步">
 <img src="https://img.shields.io/badge/%E7%A6%BB%E7%BA%BF-%E6%96%AD%E7%BD%91%E5%8F%AF%E7%94%A8-3fb950?style=for-the-badge" alt="离线">
 <img src="https://img.shields.io/badge/%E8%A7%84%E6%A8%A1-44%E5%86%8C%20%C2%B7%202166%E8%AF%BE%E8%8A%82%20%C2%B7%202.1GB-e35d6a?style=for-the-badge" alt="规模">
 </p>
+
+<p align="center">
+<img src="https://img.shields.io/badge/iStoreOS-%E5%AE%9E%E6%9C%BA%E8%B7%91%E9%80%9A-2f81f7?style=for-the-badge&logo=openwrt&logoColor=white" alt="iStoreOS">
+<img src="https://img.shields.io/badge/%E9%A3%9E%E7%89%9BfnOS-%E9%95%BF%E6%9C%9F%E8%BF%90%E8%A1%8C-2ea44f?style=for-the-badge" alt="飞牛 fnOS">
+<img src="https://img.shields.io/badge/WanOS-%E9%95%BF%E6%9C%9F%E8%BF%90%E8%A1%8C-ff6900?style=for-the-badge&logo=linux&logoColor=white" alt="WanOS">
+<img src="https://img.shields.io/badge/Debian%20%2F%20Ubuntu-%E5%B7%B2%E9%AA%8C%E8%AF%81-a80030?style=for-the-badge&logo=debian&logoColor=white" alt="Debian / Ubuntu">
+</p>
+
+<p align="center">
+<img src="https://img.shields.io/badge/%E9%83%A8%E7%BD%B2-nginx%20%2B%20WebDAV-8957e5?style=for-the-badge&logo=nginx&logoColor=white" alt="部署 nginx + WebDAV">
+</p>
+
+---
 
 [聪聪学堂](https://github.com/wuwangzhang1216/ChinaTextbookStudyFree)（ChinaStudyFree）是一个**免费、开源、纯公益**的小学全科学习平台——语文 / 数学 / 英语 / 科学，覆盖一到六年级。站点本体是 Next.js 静态导出（纯 HTML/JS/CSS，**不需要 Node 运行时**），因此随便一台能跑 nginx 的设备都能扛。
 
