@@ -12,7 +12,7 @@
 <img src="https://img.shields.io/badge/%E8%A7%84%E6%A8%A1-44%E5%86%8C%20%C2%B7%202166%E8%AF%BE%E8%8A%82%20%C2%B7%202.1GB-e35d6a?style=for-the-badge" alt="规模">
 </p>
 
-[聪聪学堂](https://github.com/wuwangzhang1216/ChinaTextbookStudyFree)（ChinaStudyFree）是一个**免费、开源、纯公益**的小学全科学习平台，<br>语文 / 数学 / 英语 / 科学，覆盖一到六年级，纯静态导出、不需要 Node 运行时，<br>因此随便一台能跑 nginx 的设备（NAS / 路由器 / 小盒子）都能稳稳扛住。
+[聪聪学堂](https://github.com/wuwangzhang1216/ChinaTextbookStudyFree)（ChinaStudyFree）是一个**免费、开源、纯公益**的小学全科学习平台，覆盖语文 / 数学 / 英语 / 科学。<br>涵盖一到六年级，纯静态导出、不用 Node 运行时，能跑 nginx 的设备就能自托管。
 
 ## 目录
 
