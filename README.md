@@ -1,5 +1,15 @@
 ![聪聪学堂 · 自托管部署套件：一份静态站点，四种平台一键部署，学习进度多设备同步。](assets/banner/banner-a.svg)
 
+<p align="center">
+  <a href="https://github.com/marspang/CSF-Nginx/releases"><img alt="版本 v1.0.0" src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-v1.0.0-f1c40f?style=flat-square"></a>
+  <a href="https://github.com/wuwangzhang1216/ChinaTextbookStudyFree"><img alt="上游 聪聪学堂" src="https://img.shields.io/badge/%E4%B8%8A%E6%B8%B8-%E8%81%AA%E8%81%AA%E5%AD%A6%E5%A0%82-2f81f7?style=flat-square"></a>
+  <img alt="支持平台" src="https://img.shields.io/badge/%E6%94%AF%E6%8C%81%E5%B9%B3%E5%8F%B0-iStoreOS%20%2F%20%E9%A3%9E%E7%89%9BfnOS%20%2F%20WanOS%20%2F%20Debian-2ea44f?style=flat-square">
+  <img alt="部署" src="https://img.shields.io/badge/%E9%83%A8%E7%BD%B2-nginx%20%2B%20WebDAV-8957e5?style=flat-square">
+  <img alt="同步" src="https://img.shields.io/badge/%E5%90%8C%E6%AD%A5-%E8%B7%A8%E8%AE%BE%E5%A4%87%E5%AD%A6%E4%B9%A0%E8%BF%9B%E5%BA%A6-fe7d37?style=flat-square">
+  <img alt="离线" src="https://img.shields.io/badge/%E7%A6%BB%E7%BA%BF-%E6%96%AD%E7%BD%91%E5%8F%AF%E7%94%A8-3fb950?style=flat-square">
+  <img alt="规模" src="https://img.shields.io/badge/%E8%A7%84%E6%A8%A1-44%E5%86%8C%20%C2%B7%202166%E8%AF%BE%E8%8A%82%20%C2%B7%202.1GB-e35d6a?style=flat-square">
+</p>
+
 # CSF-Nginx
 
 **把「聪聪学堂」搬到自己的路由器 / NAS / 小盒子上自托管，让家里所有设备共用同一份学习进度。**
