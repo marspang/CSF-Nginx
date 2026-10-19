@@ -2,7 +2,7 @@
 
 <h1 align="center">CSF-Nginx</h1>
 
-<h3 align="center">把「聪聪学堂」搬到自己的路由器 / NAS / 小盒子上自托管，让家里所有设备共用同一份学习进度。</h3>
+<h3 align="center">把「聪聪学堂」搬进自家路由器 / NAS / 小盒子<br>全屋设备共用一份学习进度，装完即用、离线断网也能继续学</h3>
 
 <p align="center">
 <a href="https://github.com/marspang/CSF-Nginx/releases"><img src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-v1.0.0-f1c40f?style=for-the-badge" alt="版本"></a>
@@ -10,17 +10,6 @@
 <img src="https://img.shields.io/badge/%E5%90%8C%E6%AD%A5-%E8%B7%A8%E8%AE%BE%E5%A4%87%E5%AD%A6%E4%B9%A0%E8%BF%9B%E5%BA%A6-fe7d37?style=for-the-badge" alt="同步">
 <img src="https://img.shields.io/badge/%E7%A6%BB%E7%BA%BF-%E6%96%AD%E7%BD%91%E5%8F%AF%E7%94%A8-3fb950?style=for-the-badge" alt="离线">
 <img src="https://img.shields.io/badge/%E8%A7%84%E6%A8%A1-44%E5%86%8C%20%C2%B7%202166%E8%AF%BE%E8%8A%82%20%C2%B7%202.1GB-e35d6a?style=for-the-badge" alt="规模">
-</p>
-
-<p align="center">
-<img src="https://img.shields.io/badge/iStoreOS-%E5%AE%9E%E6%9C%BA%E8%B7%91%E9%80%9A-2f81f7?style=for-the-badge&logo=openwrt&logoColor=white" alt="iStoreOS">
-<img src="https://img.shields.io/badge/%E9%A3%9E%E7%89%9BfnOS-%E9%95%BF%E6%9C%9F%E8%BF%90%E8%A1%8C-2ea44f?style=for-the-badge" alt="飞牛 fnOS">
-<img src="https://img.shields.io/badge/WanOS-%E9%95%BF%E6%9C%9F%E8%BF%90%E8%A1%8C-ff6900?style=for-the-badge&logo=linux&logoColor=white" alt="WanOS">
-<img src="https://img.shields.io/badge/Debian%20%2F%20Ubuntu-%E5%B7%B2%E9%AA%8C%E8%AF%81-a80030?style=for-the-badge&logo=debian&logoColor=white" alt="Debian / Ubuntu">
-</p>
-
-<p align="center">
-<img src="https://img.shields.io/badge/%E9%83%A8%E7%BD%B2-nginx%20%2B%20WebDAV-8957e5?style=for-the-badge&logo=nginx&logoColor=white" alt="部署 nginx + WebDAV">
 </p>
 
 ---
