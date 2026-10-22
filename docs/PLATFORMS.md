@@ -22,7 +22,7 @@
 - 站点直接落在 `/srv/web/out`，配置放 `/etc/nginx/sites-available/studyfree`
 - 自启：`systemctl enable nginx`
 
-适用：Debian 11/12/13、Ubuntu 20.04/22.04/24.04（含玩客云刷的 WanOS）。
+适用：Debian 11/12/13、Ubuntu 20.04/22.04/24.04（含玩客云刷的 WanOS、Armbian 26.11）。
 
 ## 平台矩阵
 
@@ -33,6 +33,7 @@
 | 群晖 / Unraid / 威联通 / TrueNAS | A | `install/nas-docker/install.sh` | ⚪ 同构，未逐台验证 |
 | 玩客云 WanOS（Ubuntu 20.04 armhf） | B | `install/wanos/install.sh` | ✅ 长期运行中（8899） |
 | Debian / Ubuntu 通用 | B | `install/debian/install.sh` | ✅ 在 Ubuntu 20.04（玩客云）上验证；Debian 同构 |
+| Armbian 26.11 / Debian 13（aarch64 盒子） | B | `install/debian/install.sh` | ✅ 已实机跑通（站点 200 / icon 200 / 进度 PUT 201 + 回读一致 / 音频 200） |
 | OpenWrt（无 Docker，原生 nginx） | — | — | ❌ 不支持，见下 |
 
 ## 已知差异点

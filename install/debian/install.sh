@@ -7,6 +7,8 @@
 #
 #  实测环境：Ubuntu 20.04.6 LTS (armhf) —— 玩客云盒子
 #    nginx-core 1.18.0 + libnginx-mod-http-dav-ext，站点 200 / 进度读写正常
+#  实测环境：Armbian 26.11 (Debian 13 trixie, aarch64)
+#    nginx 1.26.3（自带 http_dav_module），站点 200 / 进度 PUT 201 + 回读一致
 #
 #  用法：
 #    sudo bash install/debian/install.sh
