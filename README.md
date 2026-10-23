@@ -100,6 +100,9 @@ sudo bash install/debian/install.sh
 
 # 玩客云刷 WanOS（本质是 Ubuntu 20.04 armhf）
 sudo bash install/wanos/install.sh
+
+# 想直接装上游官方全量内容（45 本书 / 全部音频，约 9.5GB）就在命令后加 --upstream
+sudo bash install/debian/install.sh --upstream
 ```
 
 脚本会自动完成：装 nginx → 下站点产物 → 下静态资源 → 写 nginx 配置 → 设置进度目录权限 → 起服务并自启 → **自检**（`/`、`/icon.svg` 看状态码，再对 `/api/progress/` 做一次真实的 `PUT → GET → DELETE` 往返，确认共享进度真的可写可读）。
@@ -119,10 +122,31 @@ sudo bash install/<平台>/install.sh --uninstall --root <安装目录>
 | `--no-assets` | 先不下 2.1GB 的音频 / 课本页 / 绘本图，只把站点跑起来 |
 | `--assets-src /mnt/nas/csf-assets` | 从本地 / NAS 上已有的副本装资源（盒子直连 GitHub 很慢时用这个） |
 | `--force` | 强制重新下载站点产物 |
+| `--upstream` | 全量安装上游官方发布包（45 本书、约 2700 课时、11.9 万条 MP3，约 9.5GB） |
+| `--upstream-src /mnt/nas/csf-upstream` | 上游包已在别处下好时，直接从这里取（不再联网） |
+| `--upstream-only web,data` | 只装某几类内容，例如先跑页面与题库，音频以后再补 |
 
 > 站点产物只有 **~14MB**（Release 资产 `csf-core.tar.gz`，带 SHA256 校验）；
 > 音频 / 课本扫描页 / 绘本插图合计 **~2.1GB**，由上游项目以 Release 资产（`v1.2.0-assets`）发布，
 > 由 `scripts/fetch-assets.sh` 负责拉取与落位。
+
+### 全量装上游发布包（`--upstream`）
+
+不想只用 44 册的精简内容，而是把上游 `v1.4.3-content-restored` 的**全部东西**装到设备上，加 `--upstream`：
+
+```bash
+sudo bash install/debian/install.sh --upstream
+# 网络慢：先在 NAS 上用同一脚本把包下好，其余设备再指向它
+bash scripts/fetch-upstream.sh --site-dir /mnt/nas/csf-upstream --only web,data    # 示例
+sudo bash install/debian/install.sh --upstream --upstream-src /mnt/nas/csf-upstream
+```
+
+`scripts/fetch-upstream.sh` 会按官方 `manifest.json` 逐包 **SHA256 校验**后解压，落盘布局与上游一致：
+页面与 JS、题库与课程数据、100% 全量音频（MP3 + Opus）、教材扫描页、绘本插图。
+装完会自检两件事：`index.html` / `data/index.json` 是否齐备，以及**数据里引用的每一条音频是否都在盘上**（缺一条就报错退出）。
+
+关于公式：上游这份包是**构建期渲染好的成品**，KaTeX 只经过一次反转义，不会出现 `a.bimesc` 这类把 `\times` 吃成英文字母的页面；
+本仓库自己构建源码时，`MathText` 组件里的 `healEscapedLatex` 也会兜住同样的问题。两条路径装上后公式都是 `×` `÷`。
 
 ---
 

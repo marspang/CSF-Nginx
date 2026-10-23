@@ -31,6 +31,9 @@ PORT=8899
 ROOT=""
 WITH_ASSETS=1
 ASSETS_SRC=""
+UPSTREAM=0
+UPSTREAM_SRC=""
+UPSTREAM_ONLY=""
 UNINSTALL=0
 FORCE=""
 NEED_KB=$((4 * 1024 * 1024))   # 站点+资源 ~2.3GB，留点余量
@@ -43,6 +46,9 @@ while [ $# -gt 0 ]; do
     --root)       ROOT="$2"; shift 2 ;;
     --no-assets)  WITH_ASSETS=0; shift ;;
     --assets-src) ASSETS_SRC="$2"; shift 2 ;;
+    --upstream)   UPSTREAM=1; shift ;;
+    --upstream-src)  UPSTREAM_SRC="$2"; shift 2 ;;
+    --upstream-only) UPSTREAM_ONLY="$2"; shift 2 ;;
     --uninstall)  UNINSTALL=1; shift ;;
     --force)      FORCE="--force"; shift ;;
     -h|--help)    usage ;;
@@ -90,9 +96,18 @@ log "安装目录：$ROOT（该分区剩余 $(df -hP "$ROOT" | awk 'NR==2{print 
 # ============================================================ 配置 / 产物 / 资源
 # 容器内固定监听 80，对外端口由 -p $PORT:80 映射，所以这里渲染的是 80
 render_conf "$REPO_DIR/conf/studyfree.conf" "$CONF_DIR/default.conf" "80" "/srv/web/out" "/srv/web/progress-data"
-install_core "$SITE_ROOT" "$FORCE"
+if [ "$UPSTREAM" = 1 ]; then
+  log "安装模式：上游全量发布包"
+else
+  install_core "$SITE_ROOT" "$FORCE"
+fi
 
-if [ "$WITH_ASSETS" = 1 ]; then
+if [ "$UPSTREAM" = 1 ]; then
+  up_args=(--site-dir "$SITE_ROOT")
+  [ -n "$UPSTREAM_SRC" ] && up_args+=(--src "$UPSTREAM_SRC")
+  [ -n "$UPSTREAM_ONLY" ] && up_args+=(--only "$UPSTREAM_ONLY")
+  bash "$REPO_DIR/scripts/fetch-upstream.sh" "${up_args[@]}"
+elif [ "$WITH_ASSETS" = 1 ]; then
   if [ -n "$ASSETS_SRC" ]; then
     bash "$REPO_DIR/scripts/fetch-assets.sh" --site-dir "$SITE_ROOT" --src "$ASSETS_SRC"
   else

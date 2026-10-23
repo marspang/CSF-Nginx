@@ -69,3 +69,19 @@ OpenWrt 官方 feed 里的 nginx 包是裁剪版，**不带 `--with-http_dav_mod
 - **盒子直连 GitHub 很慢**：实测 `raw.githubusercontent.com` 不通、Release 资产下载只有
   ~11 B/s。所以给盒子装资源时建议用 `--assets-src` 指向 NAS/本机上的本地副本
   （见 `scripts/fetch-assets.sh` 的 `--src`）
+
+## 装多少内容：精简资源 vs 上游全量
+
+| 方式 | 体积 | 内容 | 命令 |
+| --- | --- | --- | --- |
+| 默认 | ~2.1GB | 站点 + 音频/课本页/绘本图（44 册配套） | `install.sh` |
+| 上游全量 | **~9.5GB** | 上游 `v1.4.3-content-restored` 全部：45 本书、约 2700 课时、1.5 万题、11.9 万条 MP3 | `install.sh --upstream` |
+
+小机器空间不够时：
+
+- 先用 `--upstream-only web,data` 只装页面与题库（约 250MB），音频以后再补
+- 或者用 `scripts/fetch-upstream.sh --site-dir ... --only web,data,textbook-pages` 自选内容
+- 想按年级裁切，可以只保留 `data/books/` 里对应书的目录、`lesson/<书>/`、`book/<书>/`，
+  再按书数据里引用的 40 位哈希挑出 `audio/<前两位>/<哈希>.mp3`；`index.json` 的
+  `books` 数组一起裁掉，首页年级卡片在 `_next/static/chunks/app/page-*.js` 里是写死的，
+  需要同步删掉对应项

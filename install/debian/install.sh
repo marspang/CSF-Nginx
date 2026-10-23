@@ -14,6 +14,9 @@
 #    sudo bash install/debian/install.sh
 #    sudo bash install/debian/install.sh --port 8899 --root /srv/web
 #    sudo bash install/debian/install.sh --no-assets
+#    # 全量装上游发布包（45 本书 / 全部音频 / 题库，约 9.5GB）
+#    sudo bash install/debian/install.sh --upstream
+#    sudo bash install/debian/install.sh --upstream --upstream-src /mnt/nas/csf-upstream
 #    sudo bash install/debian/install.sh --uninstall
 # ============================================================================
 
@@ -32,11 +35,14 @@ PORT=8899
 ROOT="/srv/web"
 WITH_ASSETS=1
 ASSETS_SRC=""
+UPSTREAM=0
+UPSTREAM_SRC=""
+UPSTREAM_ONLY=""
 UNINSTALL=0
 FORCE=""
-NEED_KB=$((3 * 1024 * 1024))   # 站点+资源 ~2.3GB
+NEED_KB=$((3 * 1024 * 1024))   # 站点+资源 ~2.3GB；上游全量的精确空间由 fetch-upstream.sh 按清单核算
 
-usage() { sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; exit 0; }
+usage() { sed -n '2,23p' "$0" | sed 's/^# \{0,1\}//'; exit 0; }
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -44,6 +50,9 @@ while [ $# -gt 0 ]; do
     --root)       ROOT="$2"; shift 2 ;;
     --no-assets)  WITH_ASSETS=0; shift ;;
     --assets-src) ASSETS_SRC="$2"; shift 2 ;;
+    --upstream)   UPSTREAM=1; shift ;;
+    --upstream-src)  UPSTREAM_SRC="$2"; shift 2 ;;
+    --upstream-only) UPSTREAM_ONLY="$2"; shift 2 ;;
     --uninstall)  UNINSTALL=1; shift ;;
     --force)      FORCE="--force"; shift ;;
     -h|--help)    usage ;;
@@ -96,7 +105,7 @@ ensure_nginx
 mkdir -p "$SITE_ROOT" "$DATA_DIR"
 AVAIL=$(df -kP "$ROOT" | awk 'NR==2{print $4}')
 if [ "$AVAIL" -lt "$NEED_KB" ]; then
-  warn "目标分区 $ROOT 剩余仅 $((AVAIL/1024))MB（建议 ≥3GB）"
+  warn "目标分区 $ROOT 剩余仅 $((AVAIL/1024))MB（本次需要 ≥$((NEED_KB/1024))MB）"
   if [ ! -f "$SITE_ROOT/index.html" ]; then
     die "空间不足，请换分区：--root /path/to/big/volume"
   fi
@@ -108,9 +117,18 @@ log "站点根：$SITE_ROOT"
 # ============================================================ 配置 / 产物 / 资源
 render_conf "$REPO_DIR/conf/studyfree.conf" "$AVAIL_CONF" "$PORT" "$SITE_ROOT" "$DATA_DIR"
 ln -sfn "$AVAIL_CONF" "$ENABLED_CONF"
-install_core "$SITE_ROOT" "$FORCE"
+if [ "$UPSTREAM" = 1 ]; then
+  log "安装模式：上游全量发布包"
+else
+  install_core "$SITE_ROOT" "$FORCE"
+fi
 
-if [ "$WITH_ASSETS" = 1 ]; then
+if [ "$UPSTREAM" = 1 ]; then
+  up_args=(--site-dir "$SITE_ROOT")
+  [ -n "$UPSTREAM_SRC" ] && up_args+=(--src "$UPSTREAM_SRC")
+  [ -n "$UPSTREAM_ONLY" ] && up_args+=(--only "$UPSTREAM_ONLY")
+  bash "$REPO_DIR/scripts/fetch-upstream.sh" "${up_args[@]}"
+elif [ "$WITH_ASSETS" = 1 ]; then
   if [ -n "$ASSETS_SRC" ]; then
     bash "$REPO_DIR/scripts/fetch-assets.sh" --site-dir "$SITE_ROOT" --src "$ASSETS_SRC"
   else
