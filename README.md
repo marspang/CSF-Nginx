@@ -88,6 +88,25 @@
 
 六册合计 5.1GB（外加共用前端约 20MB）。以上是只保留 MP3 的口径；如果同时保留 `audio-web` 的 Opus 备用格式，音频部分要再翻一倍，全量 9.5GB 就是这么来的。
 
+**容量不够也不用一次装完：可以按年级分期装**
+
+先装一两个年级，下一个年级上线时**在原站点上追加**就行，不用重装、不用删旧内容：
+
+```bash
+# 先装一年级（约 0.5GB）
+sudo bash scripts/fetch-grades.sh --src /mnt/nas/csf-full --site-dir /srv/web/out --grades 1
+
+# 半年后加二年级（约 0.6GB），一年级原样保留
+sudo bash scripts/fetch-grades.sh --src /mnt/nas/csf-full --site-dir /srv/web/out --grades 2
+```
+
+- **只增不删**：脚本只补缺失文件，重复跑同一个年级不会重复写入（实测二次执行新增 0 个文件）
+- **进度不受影响**：学习进度存在站点目录**之外**的 `progress-data/state.json`（默认在安装根目录下），
+  追加年级、替换内容、升级站点都不碰它，孩子在一台设备上的进度照旧接着用
+- **一本不缺**：每本书的课时页、题库、教材扫描页、绘本插图和它引用到的 MP3 会一起装进去，
+  装完自动重算 `data/index.json` 的书本 / 课时 / 题目数
+- 首页会保留全部年级的入口；点还没装的年级会是 404，装过的不受影响
+
 **空间不够就插 SD 卡 / U 盘**（玩客云 8G eMMC、Armbian 6.5G 卡这类设备实测只剩 2~4GB，装不下全量）：
 
 ```bash
@@ -168,6 +187,8 @@ sudo bash install/<平台>/install.sh --uninstall --root <安装目录>
 | `--upstream` | 全量安装上游官方发布包（45 本书、约 2700 课时、11.9 万条 MP3，约 9.5GB） |
 | `--upstream-src /mnt/nas/csf-upstream` | 上游包已在别处下好时，直接从这里取（不再联网） |
 | `--upstream-only web,data` | 只装某几类内容，例如先跑页面与题库，音频以后再补 |
+| `--grades 1` | （`scripts/fetch-grades.sh`）按年级装，可分期追加，已装内容与学习进度都不受影响 |
+| `--with-opus` | （`scripts/fetch-grades.sh`）连 Opus 备用音频一起装，体积约翻倍 |
 
 > 站点产物只有 **~14MB**（Release 资产 `csf-core.tar.gz`，带 SHA256 校验）；
 > 音频 / 课本扫描页 / 绘本插图合计 **~2.1GB**，由上游项目以 Release 资产（`v1.2.0-assets`）发布，
@@ -243,7 +264,9 @@ CSF-Nginx/
 │   └── wanos/                   原生路线：玩客云 WanOS（+ 盒子前置检查）
 ├── scripts/
 │   ├── lib.sh                   各安装脚本共用的函数（下载 / 校验 / 解包 / 起容器 / 自检）
-│   └── fetch-assets.sh          拉取三大静态资源包（支持 --only / --src 本地源）
+│   ├── fetch-assets.sh          拉取三大静态资源包（支持 --only / --src 本地源）
+│   ├── fetch-upstream.sh        全量装上游发布包（SHA256 校验，9.5GB）
+│   └── fetch-grades.sh          按年级装 / 分期追加（只增不删，进度不受影响）
 ├── patches/                     前端「共享进度」改造（自己重新构建源码时才需要）
 └── docs/PLATFORMS.md            平台矩阵、差异点、已知坑
 ```
